@@ -30,8 +30,22 @@ namespace TodoApi
 
             services.AddControllers();
 
-            // Register the Swagger generator, defining 1 or more Swagger documents
-            services.AddSwaggerGen(c =>
+            services.AddSwaggerGenNewtonsoftSupport();
+
+            services.AddAzureClients(builder =>
+            {
+                builder.AddClient<QueueClient, QueueClientOptions>((_, _, _) =>
+                {
+                    var storageConnectionString = "DefaultEndpointsProtocol=https;AccountName=ulsterassignmentstorage;AccountKey=TcqZuCm+qori7lEn7pybk6WYSyHaxAb87Tf0cH2I8UAdT3AMb3P3HlaPT0Q8ES6HdiXk10d1VLP64MBlBqdBZg==;EndpointSuffix=core.windows.net";
+                    var queueName = "sensor-data-queue";
+                    return new QueueClient(storageConnectionString, queueName);
+
+                });
+            });
+
+
+                // Register the Swagger generator, defining 1 or more Swagger documents
+                services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
             });

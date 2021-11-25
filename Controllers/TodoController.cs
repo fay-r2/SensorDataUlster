@@ -14,6 +14,8 @@ using TodoApi.Models;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 using TodoApi.Services;
 using System;
+using Swashbuckle.AspNetCore.Annotations;
+using System.Net;
 
 namespace TodoApi.Controllers
 {
@@ -22,14 +24,13 @@ namespace TodoApi.Controllers
     public class TodoController : Controller
     {
         private readonly TodoContext _context;
-        private readonly IQueueService _queueService;
-        private const string QUEUE_NAME = "sensor-data-queue";
+        private readonly QueueClient _queueClient;
 
 
-        public TodoController(TodoContext context, IQueueService queueService)
+        public TodoController(TodoContext context, QueueClient queueClient)
         {
             _context = context;
-            _queueService = queueService ?? throw new ArgumentNullException(nameof(queueService));
+            _queueClient = queueClient;
 
             if (_context.TodoItems.Count() == 0)
             {
@@ -106,10 +107,10 @@ namespace TodoApi.Controllers
 
         [Route("PostQueue")]
         [HttpPost]
-        public async Task PostQueue([FromBody]TodoItem todoItem)
+        public async Task PostToQueue([FromBody]SensorDataItem sensorDataItem)
         {
-            var message = JsonSerializer.Serialize(todoItem);
-            _queueService.SendMessage(QUEUE_NAME, message);
+            var message = JsonSerializer.Serialize(sensorDataItem);
+            await _queueClient.SendMessageAsync(message);
         }
 
 
