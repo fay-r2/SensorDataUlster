@@ -6,6 +6,11 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using TodoApi.Models;
+using Microsoft.Extensions.Azure;
+using Azure.Storage.Queues;
+using Azure.Identity;
+using System;
+using TodoApi.Services;
 
 namespace TodoApi
 {
@@ -21,6 +26,8 @@ namespace TodoApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddScoped<IQueueService, QueueService>();
+
             services.AddControllers();
 
             // Register the Swagger generator, defining 1 or more Swagger documents

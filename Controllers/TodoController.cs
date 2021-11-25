@@ -1,13 +1,19 @@
+using Azure.Storage.Queues;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using TodoApi.Models;
+using JsonSerializer = System.Text.Json.JsonSerializer;
+using TodoApi.Services;
+using System;
 
 namespace TodoApi.Controllers
 {
@@ -16,10 +22,14 @@ namespace TodoApi.Controllers
     public class TodoController : Controller
     {
         private readonly TodoContext _context;
+        private readonly IQueueService _queueService;
+        private const string QUEUE_NAME = "sensor-data-queue";
 
-        public TodoController(TodoContext context)
+
+        public TodoController(TodoContext context, IQueueService queueService)
         {
             _context = context;
+            _queueService = queueService ?? throw new ArgumentNullException(nameof(queueService));
 
             if (_context.TodoItems.Count() == 0)
             {
@@ -92,6 +102,16 @@ namespace TodoApi.Controllers
 
             return CreatedAtAction("GetTodoItem", new { id = todoItem.Id }, todoItem);
         }
+
+
+        [Route("PostQueue")]
+        [HttpPost]
+        public async Task PostQueue([FromBody]TodoItem todoItem)
+        {
+            var message = JsonSerializer.Serialize(todoItem);
+            _queueService.SendMessage(QUEUE_NAME, message);
+        }
+
 
         // DELETE: api/Todo/5
         [HttpDelete("{id}")]
