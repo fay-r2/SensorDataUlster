@@ -11,6 +11,7 @@ using Azure.Storage.Queues;
 using Azure.Identity;
 using System;
 using TodoApi.Services;
+using System.Text.Json.Serialization;
 
 namespace TodoApi
 {
@@ -30,6 +31,11 @@ namespace TodoApi
 
             services.AddControllers();
 
+            services.AddMvc()
+                    .AddJsonOptions(options => {
+                        options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull ;
+            });
+
             services.AddSwaggerGenNewtonsoftSupport();
 
             services.AddAzureClients(builder =>
@@ -38,7 +44,10 @@ namespace TodoApi
                 {
                     var storageConnectionString = "DefaultEndpointsProtocol=https;AccountName=ulsterassignmentstorage;AccountKey=TcqZuCm+qori7lEn7pybk6WYSyHaxAb87Tf0cH2I8UAdT3AMb3P3HlaPT0Q8ES6HdiXk10d1VLP64MBlBqdBZg==;EndpointSuffix=core.windows.net";
                     var queueName = "sensor-data-queue";
-                    return new QueueClient(storageConnectionString, queueName);
+                    return new QueueClient(storageConnectionString, queueName, new QueueClientOptions
+                    {
+                        MessageEncoding = QueueMessageEncoding.Base64
+                    });
 
                 });
             });

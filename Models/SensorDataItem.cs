@@ -1,18 +1,22 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace TodoApi.Models
 {
     public class BlobJson
     {
-        public long Width { get; set; }
+        public long? Width { get; set; } = null;
 
-        public long Height { get; set; }
 
-        public string Unit { get; set; }
+        public long? Height { get; set; } = null;
 
-        public double Reading { get; set; }
 
-        public List<long> FrameData { get; set; }
+        public string Unit { get; set; } = null;
+
+
+        public double? Reading { get; set; } = null;
+
+        public List<long> FrameData { get; set; } 
     }
 
     public class SensorDataItem
@@ -27,7 +31,7 @@ namespace TodoApi.Models
 
         public long SensorClass { get; set; }
 
-        public BlobJson BlobJson { get; set; }
+        public BlobJson BlobJson { get; set; } 
 
     }
 }

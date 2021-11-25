@@ -92,6 +92,7 @@ namespace TodoApi.Controllers
             return NoContent();
         }
 
+
         // POST: api/Todo
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
@@ -109,7 +110,12 @@ namespace TodoApi.Controllers
         [HttpPost]
         public async Task PostToQueue([FromBody]SensorDataItem sensorDataItem)
         {
-            var message = JsonSerializer.Serialize(sensorDataItem);
+            var message = JsonConvert.SerializeObject(sensorDataItem,
+            new JsonSerializerSettings()
+            {
+                NullValueHandling = NullValueHandling.Ignore
+            });
+            
             await _queueClient.SendMessageAsync(message);
         }
 
@@ -135,4 +141,6 @@ namespace TodoApi.Controllers
             return _context.TodoItems.Any(e => e.Id == id);
         }
     }
+
+
 }
